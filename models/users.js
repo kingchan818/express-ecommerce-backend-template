@@ -1,7 +1,7 @@
 const Joi = require('joi');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
-require('dotenv').config;
+require('dotenv').config();
 const { productSchema } = require('./products');
 const userSchema = new mongoose.Schema({
     username: {
@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema({
 });
 userSchema.methods.genJwt = function () {
     const token = jwt.sign(
-        { _id: user.id, isAdmin: user.isAdmin, email: user.email, username: user.username },
+        { _id: this._id, isAdmin: this.isAdmin, email: this.email, username: this.username },
         process.env.JWT_PRIVATE_KEY
     );
     return token;
