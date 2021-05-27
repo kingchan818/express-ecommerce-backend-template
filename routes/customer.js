@@ -37,8 +37,6 @@ router.post(
 router.post(
     '/account',
     asyncMiddleware(async (req, res) => {
-        throw new Error('asdasd');
-
         const token = jwt.verify(req.header('x-auth-token'), process.env.JWT_PRIVATE_KEY);
         if (!token) return res.status(500).send('Forbidden');
         const result = await User.findOne({ email: token.email });
