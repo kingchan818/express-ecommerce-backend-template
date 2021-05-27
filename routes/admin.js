@@ -21,4 +21,17 @@ router.post(
     })
 );
 
+router.delete(
+    '/:id',
+    isAdmin,
+    asyncMiddleware(async (req, res) => {
+        try {
+            const product = await Product.deleteOne({ _id: req.params.id.toString() });
+        } catch (e) {
+            return res.status(500).send('no that products');
+        }
+        res.send(product);
+    })
+);
+
 module.exports = router;

@@ -54,4 +54,6 @@ router.post(
     })
 );
 
+router.post('/order');
+
 module.exports = router;
