@@ -34,4 +34,4 @@ process.on('uncaughtException', (e) => {
 //     })
 // );
 
-exports.log = logger;
+exports.logger = logger;

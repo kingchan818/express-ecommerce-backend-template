@@ -41,14 +41,22 @@ userSchema.methods.genJwt = function () {
 const User = mongoose.model('User', userSchema);
 
 function usersVaildator(user) {
-    const schmea = {
+    const schmea = Joi.object({
         username: Joi.string().min(5).max(50).required(),
         email: Joi.string().min(5).max(250).required(),
-        password: Joi.string().min(10).max(50).required(),
-    };
-    Joi.validate(user, schmea);
+        password: Joi.string().min(5).max(50).required(),
+    });
+    return schmea.validate(user);
+}
+
+function pwVaildator(user) {
+    const schema = Joi.object({
+        password: Joi.string().min(5).max(50).required(),
+    });
+    return schema.validate(user);
 }
 
 exports.usersVaildator = usersVaildator;
 exports.userSchema = userSchema;
 exports.User = User;
+exports.pwVaildator = pwVaildator;

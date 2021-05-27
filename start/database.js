@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 
-module.exports = (log) => {
+module.exports = (logger) => {
     mongoose
         .connect('mongodb://localhost/more_proshop', { useNewUrlParser: true, useUnifiedTopology: true })
-        .then(() => log.info('connected to db....'))
-        .catch((e) => log.error(e.message, e));
+        .then(() => logger.info('connected to db....'))
+        .catch((e) => logger.error(e.message, e));
 };
