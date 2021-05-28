@@ -1,7 +1,7 @@
 const { Product, productsValidtor } = require('../models/products');
 const { User, pwVaildator, usersVaildator } = require('../models/users');
+const { Order } = require('../models/orders');
 const asyncMiddleware = require('../middleware/async');
-
 const bcrypt = require('bcrypt');
 const _ = require('lodash');
 const express = require('express');
@@ -35,7 +35,7 @@ router.post(
     })
 );
 
-//account page
+//account detial api
 
 router.post(
     '/account',
@@ -54,6 +54,24 @@ router.post(
     })
 );
 
-router.post('/order');
+router.get(
+    '/account',
+    asyncMiddleware(async (req, res) => {
+        const token = jwt.verify(req.header('x-auth-token'), process.env.JWT_PRIVATE_KEY);
+        if (!token) return res.status(500).send('Forbidden');
+        console.log(token);
+        const users = await User.findOne({ _id: token._id }).select('-password');
+        res.send(users);
+    })
+);
+
+//order
+router.get('/orders', async (req, res) => {
+    const token = jwt.verify(req.header('x-auth-token'), process.env.JWT_PRIVATE_KEY);
+    if (!token) return res.status(500).send('access denided');
+    const orders = await Order.find({ user: { _id: token._id } });
+    if (orders.length === 0) return res.send('there is no order yet');
+    res.send(orders);
+});
 
 module.exports = router;
