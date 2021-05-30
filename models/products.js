@@ -31,12 +31,13 @@ const productSchema = new mongoose.Schema({
 
 const Product = mongoose.model('Product', productSchema);
 function productsValidtor(product) {
-    const schema = {
+    const schema = Joi.object({
         name: Joi.string().min(5).max(100).required(),
         price: Joi.number().min(0).max(100000).required(),
-    };
+    });
+    return schema.validate(product);
 }
 
 exports.productSchema = productSchema;
-exports.productsValidtor =productsValidtor
+exports.productsValidtor = productsValidtor;
 exports.Product = Product;
