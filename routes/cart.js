@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
-const { CartItem } = require('../models/cartItems');
+const { Cart } = require('../models/cartItems');
+const { User } = require('../models/users');
 const { Product } = require('../models/products');
 const asyncMiddleware = require('../middleware/async');
 const { forEach } = require('lodash');
@@ -12,7 +13,7 @@ router.get(
     asyncMiddleware(async (req, res) => {
         const token = jwt.verify(req.header('x-auth-token'), process.env.JWT_PRIVATE_KEY);
         if (!token) return res.status(400).send('please login in first');
-        const result = await CartItem.findOne({
+        const result = await Cart.findOne({
             user: {
                 _id: token.id,
             },
@@ -22,6 +23,28 @@ router.get(
         res.send(result);
     })
 );
+// create Cart
+router.post('/', async (req, res) => {
+    const token = jwt.verify(req.header('x-auth-token'), process.env.JWT_PRIVATE_KEY);
+    if (!token) return res.status(400).send('please login in first');
+    console.log(token.username);
+    console.log(token._id);
+    console.log(req.body.product, req.body.quanity);
+    await addProduct(token, req.body.product, req.body.quanity);
+});
+
+async function addProduct(user, product) {
+    let cart = await Cart.findOne({ 'user._id': user._id });
+
+    if (!cart) {
+        cart = new Cart({
+            user,
+            products: product,
+        });
+        const result = await cart.save();
+        console.log(result);
+    }
+}
 
 //update carts
 router.put(
@@ -30,7 +53,7 @@ router.put(
         const token = jwt.verify(req.header('x-auth-token'), process.env.JWT_PRIVATE_KEY);
         if (!token) return res.status(400).send('please login in first');
 
-        const cartItems = await CartItem.findOne({
+        const cartItems = await Cart.findOne({
             user: {
                 _id: token.id,
             },
@@ -58,7 +81,7 @@ router.put(
         const token = jwt.verify(req.header('x-auth-token'), process.env.JWT_PRIVATE_KEY);
         if (!token) return res.status(400).send('please login in first');
 
-        const cart = await CartItem.findOne({
+        const cart = await Cart.findOne({
             user: {
                 _id: token._id,
             },

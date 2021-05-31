@@ -18,6 +18,11 @@ const productSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+    quanity: {
+        type: Number,
+        min: 1,
+        max: 10000,
+    },
     comment: {
         type: String,
         customers: [

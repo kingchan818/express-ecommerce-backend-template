@@ -2,18 +2,15 @@ const mongoose = require('mongoose');
 const {} = require('./products');
 const { userSchema } = require('./users');
 const { productSchema } = require('./products');
+const { cartItemSchema } = require('./cartItems');
 
 const orderSchema = new mongoose.Schema({
     timeCreated: {
         type: Date,
         default: Date.now,
     },
-    product: {
-        type: productSchema,
-        require: true,
-    },
-    user: {
-        type: userSchema,
+    cart: {
+        type: cartItemSchema,
         require: true,
     },
 });
