@@ -23,6 +23,12 @@ const productSchema = new mongoose.Schema({
         min: 1,
         max: 10000,
     },
+    storage: {
+        type: Number,
+        min: 0,
+        max: 10000,
+        required: true,
+    },
     comment: {
         type: String,
         customers: [
@@ -33,6 +39,17 @@ const productSchema = new mongoose.Schema({
         ],
     },
 });
+
+productSchema.methods.isAvailable = function () {
+    if (this.storage > 0) return true;
+    return false;
+};
+productSchema.methods.minusStorage = function () {
+    return this.storage - 1;
+};
+productSchema.methods.addStorage = function () {
+    return this.storage + 1;
+};
 
 const Product = mongoose.model('Product', productSchema);
 function productsValidtor(product) {

@@ -14,9 +14,7 @@ router.get(
         const token = jwt.verify(req.header('x-auth-token'), process.env.JWT_PRIVATE_KEY);
         if (!token) return res.status(400).send('please login in first');
         const result = await Cart.findOne({
-            user: {
-                _id: token.id,
-            },
+            'user._id': token._id,
         });
 
         if (!result) return res.status(400).send('there is not result');
@@ -27,9 +25,6 @@ router.get(
 router.post('/', async (req, res) => {
     const token = jwt.verify(req.header('x-auth-token'), process.env.JWT_PRIVATE_KEY);
     if (!token) return res.status(400).send('please login in first');
-    console.log(token.username);
-    console.log(token._id);
-    console.log(req.body.product, req.body.quanity);
     await addProduct(token, req.body.product, req.body.quanity);
 });
 
@@ -46,19 +41,14 @@ async function addProduct(user, product) {
     }
 }
 
-//update carts
+//update carts, if cart have existing products
 router.put(
     '/add_Product',
     asyncMiddleware(async (req, res) => {
         const token = jwt.verify(req.header('x-auth-token'), process.env.JWT_PRIVATE_KEY);
         if (!token) return res.status(400).send('please login in first');
 
-        const cartItems = await Cart.findOne({
-            user: {
-                _id: token.id,
-            },
-        });
-
+        const cartItems = await Cart.findOne({ 'user._id': token._id });
         if (!cartItems) return res.status(400).send('there are no items in your cart');
 
         const cartItem_array = cartItems.products;
@@ -67,9 +57,12 @@ router.put(
 
         if (!product_obj) return res.status(400).send('there is added product');
         cartItem_array.push(product_obj);
-
         cartItems.products = cartItem_array;
         await cartItems.save();
+        // minus the product storage
+        product_obj.minusStorage();
+        await product_obj.save();
+
         res.send(cartItems);
     })
 );
@@ -82,22 +75,21 @@ router.put(
         if (!token) return res.status(400).send('please login in first');
 
         const cart = await Cart.findOne({
-            user: {
-                _id: token._id,
-            },
+            'user._id': token._id,
         });
 
-        const delete_target = req.body.id;
-        const productArray = cart.products;
-
-        for (i = 0; i < productArray.length; i++) {
-            if (productArray[i]._id === delete_target) {
-                productArray.splice(i);
+        for (i = 0; i < cart.products.length; i++) {
+            if (cart.products[i]._id === req.body.id) {
+                cart.products.splice(i);
             }
         }
-        cart.products = productArray;
         await cart.save();
-        res.send(cart);
+
+        const product = Product.findById(req.body.id);
+        product.addStorage();
+        await product.save();
+
+        res.send(`cart::::::${cart} \n  products ::::: ${product}`);
     })
 );
 

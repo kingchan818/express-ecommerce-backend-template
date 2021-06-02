@@ -22,13 +22,5 @@ const cartItemSchema = new mongoose.Schema({
 
 const Cart = mongoose.model('Cart', cartItemSchema);
 
-function cartItemValidator(cart) {
-    const schema = Joi.object({
-        quanity: Joi.number().min(1).max(10000).required(),
-    });
-    return schema.validate(CartItem);
-}
-
 exports.Cart = Cart;
-exports.validator = cartItemValidator;
 exports.cartItemSchema = cartItemSchema;
